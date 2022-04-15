@@ -59,4 +59,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Query")
 	bool HasEdgeBetween(UGraphStructureVertex* SourceVertex, UGraphStructureVertex* TargetVertex);
+
+	// Debugging
+
+	UFUNCTION(BlueprintCallable, Category="GraphStructure|Debugging")
+	FString ExportGraphvizDotString();
 };

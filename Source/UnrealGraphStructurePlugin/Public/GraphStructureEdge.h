@@ -23,4 +23,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, meta=(ExposeOnSpawn=true))
 	UGraphStructureVertex* Target;
+
+	// Debugging
+
+	UFUNCTION(Category="GraphStructure|Debugging")
+	FString GetGraphvizDotRepresentation();
 };

@@ -3,6 +3,8 @@
 
 #include "GraphStructure.h"
 
+#include "Kismet/KismetSystemLibrary.h"
+
 UGraphStructure::UGraphStructure()
 {
 }
@@ -116,4 +118,23 @@ TSet<UGraphStructureEdge*> UGraphStructure::GetAllEdgesBetween(UGraphStructureVe
 bool UGraphStructure::HasEdgeBetween(UGraphStructureVertex* SourceVertex, UGraphStructureVertex* TargetVertex)
 {
 	return GetEdgeBetween(SourceVertex, TargetVertex) != nullptr;
+}
+
+FString UGraphStructure::ExportGraphvizDotString()
+{
+	FString DotString = FString(TEXT("graph "));
+	DotString += UKismetSystemLibrary::GetDisplayName(this);
+	DotString += " {";
+
+	for (UGraphStructureVertex* Vertex : Vertices)
+	{
+		DotString += Vertex->GetGraphvizDotRepresentation() + ";";
+	}
+	for (UGraphStructureEdge* Edge : Edges)
+	{
+		DotString += Edge->GetGraphvizDotRepresentation() + ";";
+	}
+	DotString += "}";
+
+	return DotString;
 }

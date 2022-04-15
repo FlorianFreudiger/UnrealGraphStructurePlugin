@@ -17,7 +17,15 @@ class UNREALGRAPHSTRUCTUREPLUGIN_API UGraphStructureVertex : public UObject
 
 public:
 	UGraphStructureVertex();
-	
+
 	UPROPERTY(BlueprintReadOnly)
 	TSet<UGraphStructureEdge*> Edges;
+
+	// Debugging
+
+	UFUNCTION(Category="GraphStructure|Debugging")
+	FString GetGraphvizDotNodeName();
+
+	UFUNCTION(Category="GraphStructure|Debugging")
+	FString GetGraphvizDotRepresentation();
 };
