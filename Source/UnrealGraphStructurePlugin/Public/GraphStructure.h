@@ -29,34 +29,34 @@ private:
 public:
 	// Construction
 
-	UFUNCTION(BlueprintCallable, Category="GraphStructure")
+	UFUNCTION(BlueprintCallable, Category="GraphStructure|Construction")
 	bool AddVertex(UGraphStructureVertex* Vertex);
 
-	UFUNCTION(BlueprintCallable, Category="GraphStructure")
+	UFUNCTION(BlueprintCallable, Category="GraphStructure|Construction")
 	UGraphStructureVertex* AddDefaultVertex();
 
-	UFUNCTION(BlueprintCallable, Category="GraphStructure")
+	UFUNCTION(BlueprintCallable, Category="GraphStructure|Construction")
 	bool AddEdge(UGraphStructureEdge* Edge);
 
-	UFUNCTION(BlueprintCallable, Category="GraphStructure")
+	UFUNCTION(BlueprintCallable, Category="GraphStructure|Construction")
 	UGraphStructureEdge* AddDefaultEdgeBetween(UGraphStructureVertex* SourceVertex, UGraphStructureVertex* TargetVertex);
 
 	// Destruction
 
-	UFUNCTION(BlueprintCallable, Category="GraphStructure")
+	UFUNCTION(BlueprintCallable, Category="GraphStructure|Destruction")
 	bool RemoveVertex(UGraphStructureVertex* Vertex);
 
-	UFUNCTION(BlueprintCallable, Category="GraphStructure")
+	UFUNCTION(BlueprintCallable, Category="GraphStructure|Destruction")
 	bool RemoveEdge(UGraphStructureEdge* Edge);
 
 	// Queries
 
-	UFUNCTION(BlueprintCallable, Category="GraphStructure")
+	UFUNCTION(BlueprintCallable, Category="GraphStructure|Query")
 	UGraphStructureEdge* GetEdgeBetween(UGraphStructureVertex* SourceVertex, UGraphStructureVertex* TargetVertex);
 
-	UFUNCTION(BlueprintCallable, Category="GraphStructure")
+	UFUNCTION(BlueprintCallable, Category="GraphStructure|Query")
 	TSet<UGraphStructureEdge*> GetAllEdgesBetween(UGraphStructureVertex* SourceVertex, UGraphStructureVertex* TargetVertex);
 
-	UFUNCTION(BlueprintCallable, Category="GraphStructure")
+	UFUNCTION(BlueprintCallable, Category="GraphStructure|Query")
 	bool HasEdgeBetween(UGraphStructureVertex* SourceVertex, UGraphStructureVertex* TargetVertex);
 };
