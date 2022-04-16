@@ -15,7 +15,7 @@ bool UGraphStructure::AddVertex(UGraphStructureVertex* Vertex)
 	{
 		bool AlreadyInSet = false;
 		Vertices.Add(Vertex, &AlreadyInSet);
-		return AlreadyInSet;
+		return !AlreadyInSet;
 	}
 	return false;
 }
@@ -23,7 +23,10 @@ bool UGraphStructure::AddVertex(UGraphStructureVertex* Vertex)
 UGraphStructureVertex* UGraphStructure::AddDefaultVertex()
 {
 	UGraphStructureVertex* Vertex = NewObject<UGraphStructureVertex>();
-	AddVertex(Vertex);
+
+	// Since we have just created this vertex the addition should not fail
+	verify(AddVertex(Vertex));
+
 	return Vertex;
 }
 
@@ -37,7 +40,7 @@ bool UGraphStructure::AddEdge(UGraphStructureEdge* Edge)
 		Edge->Source->Edges.Add(Edge);
 		Edge->Target->Edges.Add(Edge);
 
-		return AlreadyInSet;
+		return !AlreadyInSet;
 	}
 	return false;
 }
@@ -48,7 +51,9 @@ UGraphStructureEdge* UGraphStructure::AddDefaultEdgeBetween(UGraphStructureVerte
 	Edge->Source = SourceVertex;
 	Edge->Target = TargetVertex;
 
-	AddEdge(Edge);
+	// Since we have just created this edge the addition should not fail
+	verify(AddEdge(Edge));
+
 	return Edge;
 }
 
