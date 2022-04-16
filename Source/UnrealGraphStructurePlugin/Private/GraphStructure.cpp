@@ -15,7 +15,13 @@ bool UGraphStructure::AddVertex(UGraphStructureVertex* Vertex)
 	{
 		bool AlreadyInSet = false;
 		Vertices.Add(Vertex, &AlreadyInSet);
-		return !AlreadyInSet;
+		if (AlreadyInSet)
+		{
+			return false;
+		}
+
+		GraphStructure_OnVertexAdded.Broadcast(Vertex);
+		return true;
 	}
 	return false;
 }
@@ -39,8 +45,13 @@ bool UGraphStructure::AddEdge(UGraphStructureEdge* Edge)
 
 		Edge->Source->Edges.Add(Edge);
 		Edge->Target->Edges.Add(Edge);
+		if (AlreadyInSet)
+		{
+			return false;
+		}
 
-		return !AlreadyInSet;
+		GraphStructure_OnEdgeAdded.Broadcast(Edge);
+		return true;
 	}
 	return false;
 }
@@ -77,6 +88,9 @@ bool UGraphStructure::RemoveVertex(UGraphStructureVertex* Vertex)
 		}
 
 		verify(Vertices.Remove(Vertex) > 0);
+
+		GraphStructure_OnVertexRemoved.Broadcast(Vertex);
+
 		return true;
 	}
 	return false;
@@ -95,6 +109,8 @@ bool UGraphStructure::RemoveEdge(UGraphStructureEdge* Edge)
 		verify(Edge->Target->Edges.Remove(Edge));
 
 		verify(Edges.Remove(Edge));
+
+		GraphStructure_OnEdgeRemoved.Broadcast(Edge);
 
 		return true;
 	}

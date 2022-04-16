@@ -8,6 +8,14 @@
 #include "UObject/NoExportTypes.h"
 #include "GraphStructure.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGraphStructure_OnVertexAdded_Signature, UGraphStructureVertex*, Vertex);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGraphStructure_OnVertexRemoved_Signature, UGraphStructureVertex*, Vertex);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGraphStructure_OnEdgeAdded_Signature, UGraphStructureEdge*, Edge);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGraphStructure_OnEdgeRemoved_Signature, UGraphStructureEdge*, Edge);
+
 /**
  * 
  */
@@ -29,6 +37,12 @@ private:
 public:
 	// Construction
 
+	UPROPERTY(BlueprintAssignable)
+	FGraphStructure_OnVertexAdded_Signature GraphStructure_OnVertexAdded;
+
+	UPROPERTY(BlueprintAssignable)
+	FGraphStructure_OnEdgeAdded_Signature GraphStructure_OnEdgeAdded;
+
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Construction")
 	bool AddVertex(UGraphStructureVertex* Vertex);
 
@@ -42,6 +56,12 @@ public:
 	UGraphStructureEdge* AddDefaultEdgeBetween(UGraphStructureVertex* SourceVertex, UGraphStructureVertex* TargetVertex);
 
 	// Destruction
+
+	UPROPERTY(BlueprintAssignable)
+	FGraphStructure_OnVertexRemoved_Signature GraphStructure_OnVertexRemoved;
+
+	UPROPERTY(BlueprintAssignable)
+	FGraphStructure_OnEdgeRemoved_Signature GraphStructure_OnEdgeRemoved;
 
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Destruction")
 	bool RemoveVertex(UGraphStructureVertex* Vertex);
