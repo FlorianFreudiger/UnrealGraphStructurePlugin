@@ -69,7 +69,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Destruction")
 	bool RemoveEdge(UGraphStructureEdge* Edge);
 
-	// Queries
+	// Queries - Edges directly between 2 vertices
 
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Query")
 	UGraphStructureEdge* GetEdgeBetween(UGraphStructureVertex* SourceVertex, UGraphStructureVertex* TargetVertex);
@@ -79,6 +79,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Query")
 	bool HasEdgeBetween(UGraphStructureVertex* SourceVertex, UGraphStructureVertex* TargetVertex);
+
+	// Queries - Traversal
+
+	UFUNCTION(BlueprintCallable, Category="GraphStructure|Query")
+	TArray<UGraphStructureVertex*> BreadthFirstSearch(UGraphStructureVertex* RootVertex);
 
 	// Debugging
 

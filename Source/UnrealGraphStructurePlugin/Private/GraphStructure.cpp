@@ -141,6 +141,53 @@ bool UGraphStructure::HasEdgeBetween(UGraphStructureVertex* SourceVertex, UGraph
 	return GetEdgeBetween(SourceVertex, TargetVertex) != nullptr;
 }
 
+TArray<UGraphStructureVertex*> UGraphStructure::BreadthFirstSearch(UGraphStructureVertex* RootVertex)
+{
+	if (RootVertex == nullptr)
+	{
+		TArray<UGraphStructureVertex*> EmptyArray;
+		return EmptyArray;
+	}
+
+	TArray<UGraphStructureVertex*> Nodes;
+	TSet<UGraphStructureVertex*> DiscoveredNodes;
+
+	Nodes.Add(RootVertex);
+	// Maintain additional Set of discovered nodes so lookups are (hopefully) O(1) instead of O(N)
+	DiscoveredNodes.Add(RootVertex);
+
+	for (int i = 0; i < Nodes.Num(); ++i)
+	{
+		UGraphStructureVertex* NextNode = Nodes[i];
+		check(NextNode != nullptr);
+
+		for (const UGraphStructureEdge* Edge : NextNode->Edges)
+		{
+			check(Edge != nullptr);
+
+			UGraphStructureVertex* Source = Edge->Source;
+			UGraphStructureVertex* Target = Edge->Target;
+
+			check(Source != nullptr);
+			check(Target != nullptr);
+
+			if (!DiscoveredNodes.Contains(Source))
+			{
+				Nodes.Add(Source);
+				DiscoveredNodes.Add(Source);
+			}
+
+			if (!DiscoveredNodes.Contains(Target))
+			{
+				Nodes.Add(Target);
+				DiscoveredNodes.Add(Target);
+			}
+		}
+	}
+
+	return Nodes;
+}
+
 FString UGraphStructure::ExportGraphvizDotString()
 {
 	FString DotString = FString(TEXT("graph "));
