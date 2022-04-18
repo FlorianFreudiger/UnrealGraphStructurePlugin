@@ -44,10 +44,10 @@ public:
 	// Construction
 
 	UPROPERTY(BlueprintAssignable)
-	FGraphStructure_OnVertexAdded_Signature GraphStructure_OnVertexAdded;
+	FGraphStructure_OnVertexAdded_Signature OnVertexAdded;
 
 	UPROPERTY(BlueprintAssignable)
-	FGraphStructure_OnEdgeAdded_Signature GraphStructure_OnEdgeAdded;
+	FGraphStructure_OnEdgeAdded_Signature OnEdgeAdded;
 
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Construction")
 	bool AddVertex(UGraphStructureVertex* Vertex);
@@ -64,10 +64,10 @@ public:
 	// Destruction
 
 	UPROPERTY(BlueprintAssignable)
-	FGraphStructure_OnVertexRemoved_Signature GraphStructure_OnVertexRemoved;
+	FGraphStructure_OnVertexRemoved_Signature OnVertexRemoved;
 
 	UPROPERTY(BlueprintAssignable)
-	FGraphStructure_OnEdgeRemoved_Signature GraphStructure_OnEdgeRemoved;
+	FGraphStructure_OnEdgeRemoved_Signature OnEdgeRemoved;
 
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Destruction")
 	bool RemoveVertex(UGraphStructureVertex* Vertex);

@@ -30,7 +30,7 @@ bool UGraphStructure::AddVertex(UGraphStructureVertex* Vertex)
 			return false;
 		}
 
-		GraphStructure_OnVertexAdded.Broadcast(Vertex);
+		OnVertexAdded.Broadcast(Vertex);
 		return true;
 	}
 	return false;
@@ -60,7 +60,7 @@ bool UGraphStructure::AddEdge(UGraphStructureEdge* Edge)
 			return false;
 		}
 
-		GraphStructure_OnEdgeAdded.Broadcast(Edge);
+		OnEdgeAdded.Broadcast(Edge);
 		return true;
 	}
 	return false;
@@ -99,7 +99,7 @@ bool UGraphStructure::RemoveVertex(UGraphStructureVertex* Vertex)
 
 		verify(Vertices.Remove(Vertex) > 0);
 
-		GraphStructure_OnVertexRemoved.Broadcast(Vertex);
+		OnVertexRemoved.Broadcast(Vertex);
 
 		return true;
 	}
@@ -120,7 +120,7 @@ bool UGraphStructure::RemoveEdge(UGraphStructureEdge* Edge)
 
 		verify(Edges.Remove(Edge));
 
-		GraphStructure_OnEdgeRemoved.Broadcast(Edge);
+		OnEdgeRemoved.Broadcast(Edge);
 
 		return true;
 	}
