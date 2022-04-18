@@ -87,11 +87,8 @@ bool UGraphStructure::RemoveVertex(UGraphStructureVertex* Vertex)
 
 	if (ensure(Vertex != nullptr))
 	{
-		// One may make this quicker by not copying the edges first but iterating directly and adding an internal remove edge
-		// function that can skip the removal of the edge from the Source or Target Edges TSet.
-
 		// Copy TSet first to avoid modifying Set while iterating
-		for (UGraphStructureEdge* Edge : Edges.Array())
+		for (UGraphStructureEdge* Edge : Vertex->Edges.Array())
 		{
 			// If RemoveEdge is false halt since there is something wrong with our graph
 			verify(RemoveEdge(Edge));
@@ -115,8 +112,9 @@ bool UGraphStructure::RemoveEdge(UGraphStructureEdge* Edge)
 
 	if (ensure(Edge != nullptr) && ensure(Edge->Source != nullptr) && ensure(Edge->Target != nullptr))
 	{
+		// Remove edge from both source and target vertices Edges TSet, if edge is self-loop ignore second removal result
 		verify(Edge->Source->Edges.Remove(Edge));
-		verify(Edge->Target->Edges.Remove(Edge));
+		verify(Edge->Target->Edges.Remove(Edge) || Edge->Source == Edge->Target);
 
 		verify(Edges.Remove(Edge));
 
@@ -202,15 +200,15 @@ FString UGraphStructure::ExportGraphvizDotString()
 {
 	FString DotString = FString(TEXT("graph "));
 	DotString += UKismetSystemLibrary::GetDisplayName(this);
-	DotString += " {";
+	DotString += " {\n";
 
 	for (UGraphStructureVertex* Vertex : Vertices)
 	{
-		DotString += Vertex->GetGraphvizDotRepresentation() + ";";
+		DotString += Vertex->GetGraphvizDotRepresentation() + ";\n";
 	}
 	for (UGraphStructureEdge* Edge : Edges)
 	{
-		DotString += Edge->GetGraphvizDotRepresentation() + ";";
+		DotString += Edge->GetGraphvizDotRepresentation() + ";\n";
 	}
 	DotString += "}";
 
