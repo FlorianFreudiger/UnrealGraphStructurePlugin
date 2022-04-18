@@ -9,6 +9,16 @@ UGraphStructure::UGraphStructure()
 {
 }
 
+TSet<UGraphStructureVertex*> UGraphStructure::GetVertices()
+{
+	return Vertices;
+}
+
+TSet<UGraphStructureEdge*> UGraphStructure::GetEdges()
+{
+	return Edges;
+}
+
 bool UGraphStructure::AddVertex(UGraphStructureVertex* Vertex)
 {
 	if (ensure(Vertex != nullptr))

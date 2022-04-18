@@ -35,6 +35,12 @@ private:
 	TSet<UGraphStructureEdge*> Edges;
 
 public:
+	UFUNCTION(BlueprintPure)
+	TSet<UGraphStructureVertex*> GetVertices();
+
+	UFUNCTION(BlueprintPure)
+	TSet<UGraphStructureEdge*> GetEdges();
+
 	// Construction
 
 	UPROPERTY(BlueprintAssignable)
