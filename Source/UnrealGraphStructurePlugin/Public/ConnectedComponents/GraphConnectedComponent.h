@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GraphStructureVertex.h"
+#include "ObjectWithWorldContext.h"
 #include "UObject/NoExportTypes.h"
 #include "GraphConnectedComponent.generated.h"
 
@@ -12,7 +13,7 @@ class UGraphConnectedComponentsMonitor;
  * 
  */
 UCLASS(Blueprintable)
-class UNREALGRAPHSTRUCTUREPLUGIN_API UGraphConnectedComponent : public UObject
+class UNREALGRAPHSTRUCTUREPLUGIN_API UGraphConnectedComponent : public UObjectWithWorldContext
 {
 	friend UGraphConnectedComponentsMonitor;
 	GENERATED_BODY()
