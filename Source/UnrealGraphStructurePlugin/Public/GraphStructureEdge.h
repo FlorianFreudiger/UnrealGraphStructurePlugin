@@ -10,7 +10,7 @@ class UGraphStructureVertex;
 /**
  * 
  */
-UCLASS(BlueprintType)
+UCLASS(Blueprintable)
 class UNREALGRAPHSTRUCTUREPLUGIN_API UGraphStructureEdge : public UObject
 {
 	GENERATED_BODY()
