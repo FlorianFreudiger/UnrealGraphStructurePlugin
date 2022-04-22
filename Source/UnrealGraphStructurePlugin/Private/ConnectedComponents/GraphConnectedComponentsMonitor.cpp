@@ -3,6 +3,47 @@
 
 #include "ConnectedComponents/GraphConnectedComponentsMonitor.h"
 
+UGraphConnectedComponent* UGraphConnectedComponentsMonitor::ConnectedComponent_Spawn()
+{
+	UGraphConnectedComponent* NewConnectedComponent = NewObject<UGraphConnectedComponent>(this, ConnectedComponentClass);
+
+	NewConnectedComponent->OnCreated();
+
+	return NewConnectedComponent;
+}
+
+void UGraphConnectedComponentsMonitor::ConnectedComponent_Destroy(UGraphConnectedComponent* ConnectedComponent)
+{
+	check(ConnectedComponent != nullptr);
+	check(ConnectedComponent->Vertices.IsEmpty());
+
+	ConnectedComponent->OnDestroyed();
+}
+
+void UGraphConnectedComponentsMonitor::ConnectedComponent_AddVertex(UGraphConnectedComponent* ConnectedComponent,
+                                                                    UGraphStructureVertex* Vertex)
+{
+	check(ConnectedComponent != nullptr);
+	check(Vertex != nullptr);
+	check(!ConnectedComponent->Vertices.Contains(Vertex));
+
+	ConnectedComponent->Vertices.Add(Vertex);
+
+	ConnectedComponent->OnVertexAdded(Vertex);
+}
+
+void UGraphConnectedComponentsMonitor::ConnectedComponent_RemoveVertex(UGraphConnectedComponent* ConnectedComponent,
+                                                                       UGraphStructureVertex* Vertex)
+{
+	check(ConnectedComponent != nullptr);
+	check(Vertex != nullptr);
+	check(ConnectedComponent->Vertices.Contains(Vertex));
+
+	ConnectedComponent->Vertices.Remove(Vertex);
+
+	ConnectedComponent->OnVertexRemoved(Vertex);
+}
+
 void UGraphConnectedComponentsMonitor::GraphStructure_VertexAdded(UGraphStructureVertex* Vertex)
 {
 	check(Vertex != nullptr);
@@ -12,10 +53,8 @@ void UGraphConnectedComponentsMonitor::GraphStructure_VertexAdded(UGraphStructur
 	// Since freshly spawned vertices never have any connection yet just spawn a new ConnectionComponent, but check to be sure
 	check(Vertex->Edges.IsEmpty());
 
-	UGraphConnectedComponent* NewConnectedComponent = NewObject<UGraphConnectedComponent>();
-	OnConnectedComponentCreated.Broadcast(NewConnectedComponent);
-
-	NewConnectedComponent->AddVertex(Vertex);
+	UGraphConnectedComponent* NewConnectedComponent = ConnectedComponent_Spawn();
+	ConnectedComponent_AddVertex(NewConnectedComponent, Vertex);
 	check(NewConnectedComponent->Vertices.Num() == 1);
 
 	VerticesComponentsMap.Add(Vertex, NewConnectedComponent);
@@ -28,11 +67,11 @@ void UGraphConnectedComponentsMonitor::GraphStructure_VertexRemoved(UGraphStruct
 	check(Vertex->Edges.IsEmpty());
 
 	UGraphConnectedComponent* ConnectedComponent = VerticesComponentsMap.FindAndRemoveChecked(Vertex);
-	ConnectedComponent->RemoveVertex(Vertex);
+	ConnectedComponent_RemoveVertex(ConnectedComponent, Vertex);
 
 	if (ConnectedComponent->Vertices.IsEmpty())
 	{
-		OnConnectedComponentRemoved.Broadcast(ConnectedComponent);
+		ConnectedComponent_Destroy(ConnectedComponent);
 	}
 }
 
@@ -75,10 +114,12 @@ void UGraphConnectedComponentsMonitor::GraphStructure_EdgeAdded(UGraphStructureE
 	TSet<UGraphStructureVertex*> MigrateVertices = MergeConnectedComponent->Vertices;
 	for (UGraphStructureVertex* MigrateVertex : MigrateVertices)
 	{
-		MergeConnectedComponent->RemoveVertex(MigrateVertex);
-		KeepConnectedComponent->AddVertex(MigrateVertex);
+		ConnectedComponent_RemoveVertex(MergeConnectedComponent, MigrateVertex);
+		ConnectedComponent_AddVertex(KeepConnectedComponent, MigrateVertex);
 		VerticesComponentsMap.Add(MigrateVertex, KeepConnectedComponent);
 	}
+
+	ConnectedComponent_Destroy(MergeConnectedComponent);
 }
 
 void UGraphConnectedComponentsMonitor::GraphStructure_EdgeRemoved(UGraphStructureEdge* Edge)
@@ -115,17 +156,17 @@ void UGraphConnectedComponentsMonitor::GraphStructure_EdgeRemoved(UGraphStructur
 
 	TSet<UGraphStructureVertex*> SplitOffVertices = FoundCount > OriginalCount / 2 ? OtherVertices : FoundVertices;
 
-	UGraphConnectedComponent* NewConnectedComponent = NewObject<UGraphConnectedComponent>();
+	UGraphConnectedComponent* NewConnectedComponent = ConnectedComponent_Spawn();
 
 	for (UGraphStructureVertex* SplitOffVertex : SplitOffVertices)
 	{
-		AffectedConnectedComponent->RemoveVertex(SplitOffVertex);
-		NewConnectedComponent->AddVertex(SplitOffVertex);
+		ConnectedComponent_RemoveVertex(AffectedConnectedComponent, SplitOffVertex);
+		ConnectedComponent_AddVertex(NewConnectedComponent, SplitOffVertex);
 		VerticesComponentsMap.Add(SplitOffVertex, NewConnectedComponent);
 	}
 }
 
-void UGraphConnectedComponentsMonitor::Setup(UGraphStructure* MonitorGraph)
+void UGraphConnectedComponentsMonitor::Setup(UGraphStructure* MonitorGraph, TSubclassOf<UGraphConnectedComponent> ConnectedCompClass)
 {
 	if (SetupCompleted)
 	{
@@ -135,7 +176,8 @@ void UGraphConnectedComponentsMonitor::Setup(UGraphStructure* MonitorGraph)
 
 	check(Graph == nullptr);
 	Graph = MonitorGraph;
-	if (Graph == nullptr)
+	ConnectedComponentClass = ConnectedCompClass;
+	if (Graph == nullptr || ConnectedCompClass == nullptr)
 	{
 		return;
 	}
@@ -159,14 +201,13 @@ void UGraphConnectedComponentsMonitor::Setup(UGraphStructure* MonitorGraph)
 		{
 			TSet<UGraphStructureVertex*> FoundVertices = TSet(Graph->BreadthFirstSearch(NextVertex));
 
-			UGraphConnectedComponent* NewConnectedComponent = NewObject<UGraphConnectedComponent>();
-			OnConnectedComponentCreated.Broadcast(NewConnectedComponent);
+			UGraphConnectedComponent* NewConnectedComponent = ConnectedComponent_Spawn();
 
 			// Remove any found vertex from the RemainingVertices Set and add them to the Map so we know what component we assigned it to
 			for (UGraphStructureVertex* FoundVertex : FoundVertices)
 			{
 				RemainingVertices.Remove(FoundVertex);
-				NewConnectedComponent->AddVertex(FoundVertex);
+				ConnectedComponent_AddVertex(NewConnectedComponent, FoundVertex);
 				VerticesComponentsMap.Add(FoundVertex, NewConnectedComponent);
 			}
 

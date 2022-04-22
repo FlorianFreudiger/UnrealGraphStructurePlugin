@@ -7,15 +7,11 @@
 #include "UObject/NoExportTypes.h"
 #include "GraphConnectedComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGraphConnectedComponent_OnVertexAdded_Signature, UGraphStructureVertex*, Vertex);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGraphConnectedComponent_OnVertexRemoved_Signature, UGraphStructureVertex*, Vertex);
-
 class UGraphConnectedComponentsMonitor;
 /**
  * 
  */
-UCLASS(BlueprintType)
+UCLASS(Blueprintable)
 class UNREALGRAPHSTRUCTUREPLUGIN_API UGraphConnectedComponent : public UObject
 {
 	friend UGraphConnectedComponentsMonitor;
@@ -24,17 +20,22 @@ class UNREALGRAPHSTRUCTUREPLUGIN_API UGraphConnectedComponent : public UObject
 	UPROPERTY()
 	TSet<UGraphStructureVertex*> Vertices;
 
-	void AddVertex(UGraphStructureVertex* Vertex);
+protected:
+	// Implementable functions
 
-	void RemoveVertex(UGraphStructureVertex* Vertex);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnCreated();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDestroyed();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnVertexAdded(UGraphStructureVertex* Vertex);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnVertexRemoved(UGraphStructureVertex* Vertex);
 
 public:
 	UFUNCTION(BlueprintPure)
 	TSet<UGraphStructureVertex*> GetVertices();
-
-	UPROPERTY(BlueprintAssignable)
-	FGraphConnectedComponent_OnVertexAdded_Signature OnVertexAdded;
-
-	UPROPERTY(BlueprintAssignable)
-	FGraphConnectedComponent_OnVertexRemoved_Signature OnVertexRemoved;
 };

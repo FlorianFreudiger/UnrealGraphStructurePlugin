@@ -8,12 +8,6 @@
 #include "UObject/NoExportTypes.h"
 #include "GraphConnectedComponentsMonitor.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGraphConnectedComponentMonitor_OnConnectedComponentCreated_Signature,
-                                            UGraphConnectedComponent*, ConnectedComponent);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGraphConnectedComponentMonitor_OnConnectedComponentRemoved_Signature,
-                                            UGraphConnectedComponent*, ConnectedComponent);
-
 /**
  * 
  */
@@ -29,6 +23,19 @@ class UNREALGRAPHSTRUCTUREPLUGIN_API UGraphConnectedComponentsMonitor : public U
 
 	UPROPERTY()
 	TMap<UGraphStructureVertex*, UGraphConnectedComponent*> VerticesComponentsMap;
+
+	UPROPERTY()
+	TSubclassOf<UGraphConnectedComponent> ConnectedComponentClass;
+
+	// Internal functions that additionally call implementable functions of the ConnectedComponents
+
+	UGraphConnectedComponent* ConnectedComponent_Spawn();
+
+	void ConnectedComponent_Destroy(UGraphConnectedComponent* ConnectedComponent);
+
+	void ConnectedComponent_AddVertex(UGraphConnectedComponent* ConnectedComponent, UGraphStructureVertex* Vertex);
+
+	void ConnectedComponent_RemoveVertex(UGraphConnectedComponent* ConnectedComponent, UGraphStructureVertex* Vertex);
 
 	// Functions for binding to graph delegates
 
@@ -46,16 +53,8 @@ class UNREALGRAPHSTRUCTUREPLUGIN_API UGraphConnectedComponentsMonitor : public U
 
 public:
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|ConnectedComponents")
-	void Setup(UGraphStructure* MonitorGraph);
+	void Setup(UGraphStructure* MonitorGraph, TSubclassOf<UGraphConnectedComponent> ConnectedCompClass);
 
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|ConnectedComponents")
 	TSet<UGraphConnectedComponent*> GetAllUsedConnectedComponents();
-
-	// Delegates
-
-	UPROPERTY(BlueprintAssignable)
-	FGraphConnectedComponentMonitor_OnConnectedComponentCreated_Signature OnConnectedComponentCreated;
-
-	UPROPERTY(BlueprintAssignable)
-	FGraphConnectedComponentMonitor_OnConnectedComponentRemoved_Signature OnConnectedComponentRemoved;
 };
