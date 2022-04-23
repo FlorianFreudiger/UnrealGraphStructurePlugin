@@ -196,19 +196,39 @@ TArray<UGraphStructureVertex*> UGraphStructure::BreadthFirstSearch(UGraphStructu
 	return Nodes;
 }
 
-FString UGraphStructure::ExportGraphvizDotString()
+FString UGraphStructure::ExportGraphvizDotString(FString Name)
 {
-	FString DotString = FString(TEXT("graph "));
-	DotString += UKismetSystemLibrary::GetDisplayName(this);
-	DotString += " {\n";
+	auto ConvertMap = [](TMap<FString, FString> Map) -> FString
+	{
+		if (Map.IsEmpty())
+		{
+			return "";
+		}
 
+		FString MapString = FString(TEXT("["));
+		for (auto Element : Map)
+		{
+			MapString += "\"" + Element.Key + "\"=\"" + Element.Value + "\" ";
+		}
+		MapString += "]";
+		return MapString;
+	};
+
+	FString DotString = FString(TEXT("graph ")) + Name + "{\n";
+
+	TMap<UGraphStructureVertex*, int32> VerticesIds;
+	int32 i = 0;
 	for (UGraphStructureVertex* Vertex : Vertices)
 	{
-		DotString += Vertex->GetGraphvizDotRepresentation() + ";\n";
+		VerticesIds.Add(Vertex, i);
+		DotString += FString::FromInt(i) + ConvertMap(Vertex->GetGraphvizDotAttributes()) + ";\n";
+		++i;
 	}
 	for (UGraphStructureEdge* Edge : Edges)
 	{
-		DotString += Edge->GetGraphvizDotRepresentation() + ";\n";
+		const int32 SourceId = VerticesIds.FindChecked(Edge->Source);
+		const int32 TargetId = VerticesIds.FindChecked(Edge->Target);
+		DotString += FString::FromInt(SourceId) + "--" + FString::FromInt(TargetId) + ConvertMap(Edge->GetGraphvizDotAttributes()) + ";\n";
 	}
 	DotString += "}";
 

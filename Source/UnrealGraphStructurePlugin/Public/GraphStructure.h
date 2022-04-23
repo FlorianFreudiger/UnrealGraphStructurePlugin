@@ -94,5 +94,5 @@ public:
 	// Debugging
 
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Debugging")
-	FString ExportGraphvizDotString();
+	FString ExportGraphvizDotString(FString Name = "G");
 };

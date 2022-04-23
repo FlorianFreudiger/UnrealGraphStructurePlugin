@@ -23,9 +23,6 @@ public:
 
 	// Debugging
 
-	UFUNCTION(Category="GraphStructure|Debugging")
-	FString GetGraphvizDotNodeName();
-
-	UFUNCTION(Category="GraphStructure|Debugging")
-	FString GetGraphvizDotRepresentation();
+	UFUNCTION(BlueprintImplementableEvent, Category="GraphStructure|Debugging")
+	TMap<FString, FString> GetGraphvizDotAttributes();
 };
