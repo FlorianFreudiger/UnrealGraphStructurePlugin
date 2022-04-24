@@ -86,10 +86,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Query")
 	bool HasEdgeBetween(UGraphStructureVertex* SourceVertex, UGraphStructureVertex* TargetVertex);
 
-	// Queries - Traversal
+	// Queries
 
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Query")
-	TArray<UGraphStructureVertex*> BreadthFirstSearch(UGraphStructureVertex* RootVertex);
+	TSet<UGraphStructureVertex*> FindAllConnectedVertices(UGraphStructureVertex* RootVertex);
 
 	// Debugging
 

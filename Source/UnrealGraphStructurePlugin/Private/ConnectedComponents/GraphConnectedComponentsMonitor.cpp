@@ -138,7 +138,7 @@ void UGraphConnectedComponentsMonitor::GraphStructure_EdgeRemoved(UGraphStructur
 	check(AffectedConnectedComponent->Vertices.Contains(Source));
 	check(AffectedConnectedComponent->Vertices.Contains(Target));
 
-	const TSet<UGraphStructureVertex*> FoundVertices = TSet(Graph->BreadthFirstSearch(Source));
+	const TSet<UGraphStructureVertex*> FoundVertices = Graph->FindAllConnectedVertices(Source);
 	if (FoundVertices.Contains(Target))
 	{
 		// Target vertex found, the vertices are still connected someway else, no need to split component
@@ -199,7 +199,7 @@ void UGraphConnectedComponentsMonitor::Setup(UGraphStructure* MonitorGraph, TSub
 		// Get first Element via for loop iterator
 		for (UGraphStructureVertex* NextVertex : RemainingVertices)
 		{
-			TSet<UGraphStructureVertex*> FoundVertices = TSet(Graph->BreadthFirstSearch(NextVertex));
+			TSet<UGraphStructureVertex*> FoundVertices = Graph->FindAllConnectedVertices(NextVertex);
 
 			UGraphConnectedComponent* NewConnectedComponent = ConnectedComponent_Spawn();
 

@@ -149,24 +149,26 @@ bool UGraphStructure::HasEdgeBetween(UGraphStructureVertex* SourceVertex, UGraph
 	return GetEdgeBetween(SourceVertex, TargetVertex) != nullptr;
 }
 
-TArray<UGraphStructureVertex*> UGraphStructure::BreadthFirstSearch(UGraphStructureVertex* RootVertex)
+TSet<UGraphStructureVertex*> UGraphStructure::FindAllConnectedVertices(UGraphStructureVertex* RootVertex)
 {
 	if (RootVertex == nullptr)
 	{
-		TArray<UGraphStructureVertex*> EmptyArray;
-		return EmptyArray;
+		TSet<UGraphStructureVertex*> EmptySet;
+		return EmptySet;
 	}
 
-	TArray<UGraphStructureVertex*> Nodes;
+	// Use Breadth-First-Search to find all connected vertices
+
 	TSet<UGraphStructureVertex*> DiscoveredNodes;
+	TQueue<UGraphStructureVertex*> Queue;
 
-	Nodes.Add(RootVertex);
-	// Maintain additional Set of discovered nodes so lookups are (hopefully) O(1) instead of O(N)
 	DiscoveredNodes.Add(RootVertex);
+	Queue.Enqueue(RootVertex);
 
-	for (int i = 0; i < Nodes.Num(); ++i)
+	while (!Queue.IsEmpty())
 	{
-		UGraphStructureVertex* NextNode = Nodes[i];
+		UGraphStructureVertex* NextNode;
+		verify(Queue.Dequeue(NextNode));
 		check(NextNode != nullptr);
 
 		for (const UGraphStructureEdge* Edge : NextNode->Edges)
@@ -181,19 +183,19 @@ TArray<UGraphStructureVertex*> UGraphStructure::BreadthFirstSearch(UGraphStructu
 
 			if (!DiscoveredNodes.Contains(Source))
 			{
-				Nodes.Add(Source);
 				DiscoveredNodes.Add(Source);
+				Queue.Enqueue(Source);
 			}
 
 			if (!DiscoveredNodes.Contains(Target))
 			{
-				Nodes.Add(Target);
 				DiscoveredNodes.Add(Target);
+				Queue.Enqueue(Target);
 			}
 		}
 	}
 
-	return Nodes;
+	return DiscoveredNodes;
 }
 
 FString UGraphStructure::ExportGraphvizDotString(FString Name)
