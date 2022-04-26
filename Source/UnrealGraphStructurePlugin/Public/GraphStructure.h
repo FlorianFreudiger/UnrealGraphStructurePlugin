@@ -91,6 +91,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Query")
 	TSet<UGraphStructureVertex*> FindAllConnectedVertices(UGraphStructureVertex* RootVertex);
 
+	UFUNCTION(BlueprintCallable, Category="GraphStructure|Query|ShortestPath")
+	bool BfsShortestPath(UGraphStructureVertex* SourceVertex, UGraphStructureVertex* TargetVertex,
+	                     TArray<UGraphStructureVertex*>& ShortestPath);
+
 	// Debugging
 
 	UFUNCTION(BlueprintCallable, Category="GraphStructure|Debugging")

@@ -3,8 +3,6 @@
 
 #include "GraphStructure.h"
 
-#include "Kismet/KismetSystemLibrary.h"
-
 UGraphStructure::UGraphStructure()
 {
 }
@@ -175,27 +173,99 @@ TSet<UGraphStructureVertex*> UGraphStructure::FindAllConnectedVertices(UGraphStr
 		{
 			check(Edge != nullptr);
 
-			UGraphStructureVertex* Source = Edge->Source;
-			UGraphStructureVertex* Target = Edge->Target;
-
-			check(Source != nullptr);
-			check(Target != nullptr);
-
-			if (!DiscoveredNodes.Contains(Source))
+			auto ProcessVertex = [&](UGraphStructureVertex* Vertex)
 			{
-				DiscoveredNodes.Add(Source);
-				Queue.Enqueue(Source);
-			}
+				check(Vertex != nullptr);
+				if (!DiscoveredNodes.Contains(Vertex))
+				{
+					check(Vertex != NextNode);
+					DiscoveredNodes.Add(Vertex);
+					Queue.Enqueue(Vertex);
+				}
+			};
 
-			if (!DiscoveredNodes.Contains(Target))
-			{
-				DiscoveredNodes.Add(Target);
-				Queue.Enqueue(Target);
-			}
+			ProcessVertex(Edge->Source);
+			ProcessVertex(Edge->Target);
 		}
 	}
 
 	return DiscoveredNodes;
+}
+
+bool UGraphStructure::BfsShortestPath(UGraphStructureVertex* SourceVertex, UGraphStructureVertex* TargetVertex,
+                                      TArray<UGraphStructureVertex*>& ShortestPath)
+{
+	check(ShortestPath.IsEmpty());
+	if (SourceVertex == nullptr || TargetVertex == nullptr)
+	{
+		return false;
+	}
+
+	TMap<UGraphStructureVertex*, UGraphStructureVertex*> ParentMap;
+	TQueue<UGraphStructureVertex*> Queue;
+
+	ParentMap.Add(SourceVertex, nullptr);
+	Queue.Enqueue(SourceVertex);
+
+	while (!Queue.IsEmpty())
+	{
+		UGraphStructureVertex* NextNode;
+		verify(Queue.Dequeue(NextNode));
+		check(NextNode != nullptr);
+
+		for (const UGraphStructureEdge* Edge : NextNode->Edges)
+		{
+			check(Edge != nullptr);
+
+			auto ProcessVertex = [&](UGraphStructureVertex* Vertex) -> bool
+			{
+				check(Vertex != nullptr);
+				if (!ParentMap.Contains(Vertex))
+				{
+					check(Vertex != NextNode);
+					ParentMap.Add(Vertex, NextNode);
+
+					if (Vertex == TargetVertex)
+					{
+						// We can stop mapping ParentNodes as soon as we found the TargetNode
+						Queue.Empty();
+						return true;
+					}
+
+					Queue.Enqueue(Vertex);
+				}
+				return false;
+			};
+
+			// Only process Target if Source is not found to be TargetVertex
+			if (!ProcessVertex(Edge->Source))
+			{
+				ProcessVertex(Edge->Target);
+			}
+		}
+	}
+
+	// If ParentMap doesn't contain TargetVertex then there is no path between SourceVertex and TargetVertex
+	if (!ParentMap.Contains(TargetVertex))
+	{
+		return false;
+	}
+
+	// Backtrack ParentMap to find path
+	UGraphStructureVertex* CurrentVertex = TargetVertex;
+	while (CurrentVertex != nullptr)
+	{
+		ShortestPath.Add(CurrentVertex);
+
+		check(CurrentVertex != ParentMap.FindChecked(CurrentVertex));
+		CurrentVertex = ParentMap.FindChecked(CurrentVertex);
+	}
+
+	// Reverse path since the last vertices of the path have been inserted first, we could optimize this by running BFS in reverse,
+	// but that would decrease code readability
+	Algo::Reverse(ShortestPath);
+
+	return true;
 }
 
 FString UGraphStructure::ExportGraphvizDotString(FString Name)
